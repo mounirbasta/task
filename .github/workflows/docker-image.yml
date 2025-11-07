@@ -86,7 +86,7 @@ jobs:
       uses: zaproxy/action-baseline@v0.9.0
       with:
         target: 'http://localhost:5000'
-        cmd_options: '-m 2 -J'
+        cmd_options: '-m 2 -I -J zap-report.json -w zap-report.md -r zap-report.html'
     
     #Upload to artifact    
     - name: Upload security reports
