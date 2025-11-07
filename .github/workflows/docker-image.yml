@@ -1,11 +1,15 @@
-name: Docker Image CI
+name: Docker Image Build, Test and Push to GCR
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    
+env:
+  REGISTRY: gcr.io
+  IMAGE_NAME: task
+  
 jobs:
 
   build:
@@ -112,3 +116,38 @@ jobs:
         else
           echo "No container to clean up"
         fi
+
+  push-to-gcr:
+    runs-on: ubuntu-latest
+    needs: build  
+    if: always() && needs.build.result == 'success'
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker for GCR
+      run: |
+        gcloud auth configure-docker --quiet
+
+    - name: Pull and Push to GCR
+      run: |
+        # Pull the built image (it would be in the previous job's cache)
+        docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+        docker push ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        docker push ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+
+    - name: Verify pushed images
+      run: |
+        echo "Images pushed to GCR:"
+        gcloud container images list-tags ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }} --format="table(tags, digest, timestamp)"
