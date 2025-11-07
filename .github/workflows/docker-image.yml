@@ -63,12 +63,21 @@ jobs:
         sleep 5
     
         # Check container is running
-        docker ps | grep $CONTAINER_ID
-        curl -f http://localhost:5000/health || exit 1
+        docker ps --filter "id=$CONTAINER_ID"
+        CONTAINER_STATUS=$(docker inspect $CONTAINER_ID --format='{{.State.Status}}')
+        if [ "$CONTAINER_STATUS" != "healthy" ]; then
+          exit 1
+        fi
+        echo "Container is up and running"
         
     #Run OWASP for DAST testing   
     - name: Cleanup container
       if: always()
       run: |
-        docker stop $CONTAINER_ID || true
-        docker rm $CONTAINER_ID || true
+        if [ -n "$CONTAINER_ID" ]; then
+          docker stop $CONTAINER_ID || true
+          docker rm $CONTAINER_ID || true
+          echo "Container cleaned up"
+        else
+          echo "No container to clean up"
+        fi
