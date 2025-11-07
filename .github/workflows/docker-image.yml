@@ -58,14 +58,10 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ env.IMAGE_TAG }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        format: 'table'
+        output: 'trivy-results.txt'
         exit-code: 0
-        
-    - name: Generate Trivy HTML report
-      continue-on-error: true
-      run: |
-        trivy image --format html -o trivy-report.html ${{ env.IMAGE_TAG }} --skip-version-check
+        skip-version-check: true
         
     - name: Run container smoke test
       run: |
@@ -93,7 +89,7 @@ jobs:
         target: 'http://localhost:5000'
         cmd_options: '-m 2 -I -a -s' 
     
-    #Upload to artifact    
+    #Upload to artifact        
     - name: Upload security reports
       uses: actions/upload-artifact@v4
       with:
