@@ -34,5 +34,18 @@ jobs:
     - name: Run Python lint
       run: ruff check
 
+  #Run Unit test with coverage if there is any
+  #Pass to SonarQube
+  
+    - name: Install gitleaks
+      run: |
+        curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz | tar -xz
+        sudo mv gitleaks /usr/local/bin/
+
+    - name: Run gitleaks scan
+      run: gitleaks detect --source=. --exit-code=1
+      
     - name: Docker Build 
       run: docker build . --file Dockerfile --tag app:$(date +%s)
+
+    #Can start the app and run OWASP for DAST testing   
