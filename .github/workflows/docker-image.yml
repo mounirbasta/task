@@ -32,7 +32,7 @@ jobs:
       run: pip install ruff
 
     - name: Run Python lint
-      run: ruff app
+      run: ruff check
 
     - name: Docker Build 
       run: docker build . --file Dockerfile --tag app:$(date +%s)
