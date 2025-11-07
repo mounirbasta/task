@@ -50,14 +50,15 @@ jobs:
       
     - name: Docker Build 
       run: |  
-        docker build . --file Dockerfile --tag app:$(date +%s)
+        IMAGE_TAG=app:$(date +%s)
+        docker build . --file Dockerfile --tag $IMAGE_TAG
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
     - name: Run container smoke test
       run: |
         # Run container in detached mode
-        CONTAINER_ID=$(docker run -d ${{ env.IMAGE_TAG }})
-    
+        CONTAINER_ID=$(docker run -d -p 5000:5000 ${{ env.IMAGE_TAG }})
+
         # Wait a few seconds for it to start
         sleep 5
     
@@ -65,4 +66,9 @@ jobs:
         docker ps | grep $CONTAINER_ID
         curl -f http://localhost:5000/health || exit 1
         
-    #Can start the app and run OWASP for DAST testing   
+    #Run OWASP for DAST testing   
+    - name: Cleanup container
+      if: always()
+      run: |
+        docker stop $CONTAINER_ID || true
+        docker rm $CONTAINER_ID || true
