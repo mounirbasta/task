@@ -49,6 +49,19 @@ jobs:
       run: gitleaks detect --source=. --exit-code=1
       
     - name: Docker Build 
-      run: docker build . --file Dockerfile --tag app:$(date +%s)
+      run: |  
+        docker build . --file Dockerfile --tag app:$(date +%s)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
+    - name: Run container smoke test
+      run: |
+        # Run container in detached mode
+        CONTAINER_ID=$(docker run -d $IMAGE_TAG)
+    
+        # Wait a few seconds for it to start
+        sleep 5
+    
+        # Check container is running
+        docker ps | grep $CONTAINER_ID
+    
     #Can start the app and run OWASP for DAST testing   
