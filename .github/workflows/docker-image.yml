@@ -60,7 +60,7 @@ jobs:
         CONTAINER_ID=$(docker run -d -p 5000:5000 ${{ env.IMAGE_TAG }})
 
         # Wait a few seconds for it to start
-        sleep 5
+        sleep 30
     
         # Check container is running
         docker ps --filter "id=$CONTAINER_ID"
@@ -69,6 +69,9 @@ jobs:
           exit 1
         fi
         echo "Container is up and running"
+        #Another Check 
+        curl -f http://localhost:5000/health
+
         
     #Run OWASP for DAST testing   
     - name: Cleanup container
