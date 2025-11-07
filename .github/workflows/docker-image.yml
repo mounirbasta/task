@@ -39,7 +39,8 @@ jobs:
   
     - name: Install Gitleaks v8.29.0
       run: |
-        curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.29.0/gitleaks_8.29.0_linux_amd64.tar.gz | tar -xz
+        curl -sSL -o gitleaks https://github.com/gitleaks/gitleaks/releases/download/v8.29.0/gitleaks_8.29.0_linux_amd64
+        chmod +x gitleaks
         sudo mv gitleaks /usr/local/bin/gitleaks
         gitleaks version
     
