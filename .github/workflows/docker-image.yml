@@ -88,7 +88,8 @@ jobs:
       with:
         target: 'http://localhost:5000/health'
         cmd_options: '-m 2 -I -a -s'
-        
+        fail_action: false   
+    
     #Upload to artifact        
     - name: Upload security reports
       uses: actions/upload-artifact@v4
