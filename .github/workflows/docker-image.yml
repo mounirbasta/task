@@ -54,30 +54,13 @@ jobs:
         docker build . --file Dockerfile --tag $IMAGE_TAG
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
         
-    - name: Run comprehensive Trivy scan
-      continue-on-error: true
-      run: |
-        trivy image \
-          --security-checks vuln,secret,config \
-          --severity CRITICAL,HIGH,MEDIUM,LOW \
-          --format sarif \
-          --output trivy-results.sarif \
-          ${{ env.IMAGE_TAG }} || true
-    
-    - name: Check if scan results exist
-      run: |
-        if [ -f "trivy-results.sarif" ]; then
-          echo "Scan results found"
-        else
-          echo "No scan results file created"
-          touch trivy-results.sarif  # Create empty file
-        fi
-    
-    - name: Upload Trivy scan results
-      uses: actions/upload-artifact@v4
+    - name: Trivy vulnerability scan
+      uses: aquasecurity/trivy-action@master
       with:
-        name: trivy-scan-results
-        path: trivy-results.sarif     
+        image-ref: ${{ env.IMAGE_TAG }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        exit-code: 0
         
     - name: Run container smoke test
       run: |
@@ -99,24 +82,21 @@ jobs:
 
         
     #Run OWASP for DAST testing  
-    - name: Quick OWASP ZAP Scan
-      continue-on-error: true
-      run: |
-        docker run --network host -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable \
-          zap-baseline.py -t http://localhost:5000 -m 2 -J zap-report.json || true
+    - name: OWASP ZAP scan
+      uses: zaproxy/action-baseline@v0.9.0
+      with:
+        target: 'http://localhost:5000'
+        cmd_options: '-m 2 -J'
     
-    - name: Check if ZAP report exists
-      run: |
-        if [ ! -f "zap-report.json" ]; then
-          echo '{"@version": "1.0", "title": "ZAP Scan - No results generated"}' > zap-report.json
-        fi
-    
-    - name: Upload ZAP report
+    #Upload to artifact    
+    - name: Upload security reports
       uses: actions/upload-artifact@v4
       with:
-        name: zap-security-report
-        path: zap-report.json
-    
+        name: security-scan-results
+        path: |
+          trivy-results.sarif
+          zap-report.json 
+          
     - name: Cleanup container
       if: always()
       run: |
