@@ -56,12 +56,13 @@ jobs:
     - name: Run container smoke test
       run: |
         # Run container in detached mode
-        CONTAINER_ID=$(docker run -d $IMAGE_TAG)
+        CONTAINER_ID=$(docker run -d ${{ env.IMAGE_TAG }})
     
         # Wait a few seconds for it to start
         sleep 5
     
         # Check container is running
         docker ps | grep $CONTAINER_ID
-    
+        curl -f http://localhost:5000/health || exit 1
+        
     #Can start the app and run OWASP for DAST testing   
