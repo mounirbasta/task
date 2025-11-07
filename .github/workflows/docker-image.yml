@@ -37,12 +37,13 @@ jobs:
   #Run Unit test with coverage if there is any
   #Pass to SonarQube
   
-    - name: Install gitleaks
+    - name: Install Gitleaks v8.29.0
       run: |
-        curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz | tar -xz
-        sudo mv gitleaks /usr/local/bin/
-
-    - name: Run gitleaks scan
+        curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.29.0/gitleaks_8.29.0_linux_amd64.tar.gz | tar -xz
+        sudo mv gitleaks /usr/local/bin/gitleaks
+        gitleaks version
+    
+    - name: Run Gitleaks scan
       run: gitleaks detect --source=. --exit-code=1
       
     - name: Docker Build 
