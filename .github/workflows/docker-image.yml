@@ -15,4 +15,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
+
+    - name: Install hadolint
+      run: |
+        wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+        chmod +x /usr/local/bin/hadolint
+
+    - name: Run Dockerfile lint
+      run: hadolint Dockerfile
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install Python linter (ruff)
+      run: pip install ruff
+
+    - name: Run Python lint
+      run: ruff app
+
+    - name: Docker Build 
       run: docker build . --file Dockerfile --tag app:$(date +%s)
