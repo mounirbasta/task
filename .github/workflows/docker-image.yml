@@ -58,9 +58,13 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ env.IMAGE_TAG }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        format: 'table'  # Better for console view
+        output: 'trivy-results.txt'
         exit-code: 0
+        
+    - name: Generate Trivy HTML report
+      run: |
+        trivy image --format template --template "@contrib/html.tpl" -o trivy-report.html ${{ env.IMAGE_TAG }}
         
     - name: Run container smoke test
       run: |
@@ -86,7 +90,7 @@ jobs:
       uses: zaproxy/action-baseline@v0.9.0
       with:
         target: 'http://localhost:5000'
-        cmd_options: '-m 2 -I -J zap-report.json -w zap-report.md -r zap-report.html'
+        cmd_options: '-m 2 -I -a -s' 
     
     #Upload to artifact    
     - name: Upload security reports
@@ -94,8 +98,11 @@ jobs:
       with:
         name: security-scan-results
         path: |
-          trivy-results.sarif
-          zap-report.json 
+          trivy-results.txt
+          trivy-report.html
+          report_json.json
+          report_md.md
+          report_html.html
           
     - name: Cleanup container
       if: always()
