@@ -64,7 +64,7 @@ jobs:
     
         # Check container is running
         docker ps --filter "id=$CONTAINER_ID"
-        CONTAINER_STATUS=$(docker inspect $CONTAINER_ID --format='{{.State.Status}}')
+        CONTAINER_STATUS=$(docker inspect $CONTAINER_ID --format='{{.State.Health.Status}}')
         if [ "$CONTAINER_STATUS" != "healthy" ]; then
           exit 1
         fi
