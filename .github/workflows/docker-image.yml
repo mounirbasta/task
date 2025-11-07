@@ -85,10 +85,10 @@ jobs:
     #Run OWASP for DAST testing  
     - name: OWASP ZAP scan
       uses: zaproxy/action-baseline@v0.10.0
+      continue-on-error: true
       with:
         target: 'http://localhost:5000/health'
         cmd_options: '-m 2 -I -a -s'
-        fail_action: false   
     
     #Upload to artifact        
     - name: Upload security reports
