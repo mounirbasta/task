@@ -10,4 +10,8 @@ def create_app():
     app.register_blueprint(user_blueprint)
     app.register_blueprint(product_blueprint)
 
+    @app.route('/health')
+    def health_check():
+        return {'status': 'healthy', 'service': 'running'}, 200
+
     return app
