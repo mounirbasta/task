@@ -15,6 +15,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    outputs: 
+      image-tag: ${{ steps.set-tag.outputs.image-tag }}
 
     steps:
     - uses: actions/checkout@v4
@@ -56,7 +58,24 @@ jobs:
       run: |  
         IMAGE_TAG=app:$(date +%s)
         docker build . --file Dockerfile --tag $IMAGE_TAG
+        docker tag $IMAGE_TAG ${{ env.IMAGE_NAME }}:${{ github.sha }}
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+    
+    - name: Set image tag output
+      id: set-tag
+      run: |
+        echo "image-tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+        
+    - name: Save Docker image to artifact
+      run: |
+        docker save ${{ env.IMAGE_NAME }}:${{ github.sha }} -o image.tar
+
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: image.tar
+        retention-days: 1
         
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
@@ -126,6 +145,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Download Docker image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: Load Docker image
+      run: |
+        docker load -i image.tar
+        
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
@@ -140,8 +168,6 @@ jobs:
 
     - name: Pull and Push to GCR
       run: |
-        # Pull the built image (it would be in the previous job's cache)
-        docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
         docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
         docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
         docker push ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
