@@ -168,10 +168,11 @@ jobs:
 
     - name: Pull and Push to GCR
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
-        docker push ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-        docker push ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+        REGISTRY_LOCATION=europe-west3
+        docker tag ${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image-tag }} ${{ env.REGISTRY }}/$REGISTRY_LOCATION/${{ secrets.GCP_PROJECT_ID }}/task:${{ needs.build.outputs.image-tag }}
+        docker tag ${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image-tag }} ${{ env.REGISTRY }}/$REGISTRY_LOCATION/${{ secrets.GCP_PROJECT_ID }}/task:latest
+        docker push ${{ env.REGISTRY }}/$REGISTRY_LOCATION/${{ secrets.GCP_PROJECT_ID }}/task:${{ needs.build.outputs.image-tag }}
+        docker push ${{ env.REGISTRY }}/$REGISTRY_LOCATION/${{ secrets.GCP_PROJECT_ID }}/task:latest
 
     - name: Verify pushed images
       run: |
