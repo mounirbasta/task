@@ -171,12 +171,15 @@ jobs:
     - name: Pull and Push to GCR
       run: |
         REGISTRY_LOCATION=europe-west3
-        docker tag ${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image-tag }} gcr.io/optical-legend-477521-b8/task:${{ needs.build.outputs.image-tag }}
-        docker tag ${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image-tag }} gcr.io/optical-legend-477521-b8/task:latest
-        docker push gcr.io/optical-legend-477521-b8/task:${{ needs.build.outputs.image-tag }}
-        docker push gcr.io/optical-legend-477521-b8/task:latest
+        docker tag task:${{ needs.build.outputs.image-tag }} europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:${{ needs.build.outputs.image-tag }}
+        docker tag task:${{ needs.build.outputs.image-tag }} europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:latest
+        
+        echo "Pushing to Artifact Registry..."
+        docker push europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:${{ needs.build.outputs.image-tag }}
+        docker push europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:latest
+
 
     - name: Verify pushed images
       run: |
         echo "Images pushed to GCR:"
-        gcloud container images list-tags ${{ env.REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }} --format="table(tags, digest, timestamp)"
+        gcloud artifacts docker tags list europe-west3-docker.pkg.dev/optical-legend-477521-b8/task
