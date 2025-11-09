@@ -232,5 +232,21 @@ jobs:
           yq eval '.spec.template.spec.containers[0].image' deployments/app-dev.yaml
 
           cat deployments/app-dev.yaml
+          
+      - name: Commit and Push Changes
+        run: |
+          cd gitops-repo
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add deployments/app-dev.yaml
+          
+          # Check if there are changes
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update python app image to ${{ github.sha }}"
+            git push origin main
+            echo "Successfully updated k8s GitOps repository"
+          else
+            echo "No changes to commit"
+          fi
 
           
