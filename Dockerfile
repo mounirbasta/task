@@ -33,5 +33,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=2)" || exit 1
 
 # Define the command to run your application
-#CMD ["python", "run.py"]
 CMD ["python", "-c", "from app.main import app; app.run(host='0.0.0.0', port=5000)"]
