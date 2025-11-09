@@ -221,7 +221,7 @@ jobs:
       - name: Update Deployment YAML
         run: |
           cd gitops-repo
-          NEW_IMAGE="europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:${{ needs.build.outputs.image-tag }}"
+          NEW_IMAGE="europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:${{ github.sha }}"
           echo "Updating to image: $NEW_IMAGE"
           
           # Update the image in the deployment file
