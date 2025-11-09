@@ -167,9 +167,6 @@ jobs:
       with:
         project_id: optical-legend-477521-b8      
 
-    - name: Configure Docker for GCR
-      run: |
-        gcloud auth configure-docker --quiet
 
     - name: Pull and Push to GCR
       run: |
