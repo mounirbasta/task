@@ -1,4 +1,4 @@
-name: Docker Image Build, Test and Push to GCR
+name: Docker Image Build, Test, Push to GCR and update K8s repo
 
 on:
   push:
