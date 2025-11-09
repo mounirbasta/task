@@ -215,5 +215,22 @@ jobs:
           echo "Deployments directory contents:"
           ls -la deployments/
           echo "Current image in app-dev.yaml:"
-  
+          yq eval '.spec.template.spec.containers[0].image' deployments/app-dev.yaml || echo "yq command failed"
+          grep "image:" deployments/app-dev.yaml  
+
+      - name: Update Deployment YAML
+        run: |
+          cd gitops-repo
+          NEW_IMAGE="europe-west3-docker.pkg.dev/optical-legend-477521-b8/task/task:${{ needs.build.outputs.image-tag }}"
+          echo "Updating to image: $NEW_IMAGE"
+          
+          # Update the image in the deployment file
+          yq eval ".spec.template.spec.containers[0].image = \"$NEW_IMAGE\"" -i deployments/app-dev.yaml
+          
+          # Verify the change
+          echo "Updated deployment image to:"
+          yq eval '.spec.template.spec.containers[0].image' deployments/app-dev.yaml
+
+          cat deployments/app-dev.yaml
+
           
