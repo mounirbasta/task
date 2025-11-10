@@ -106,7 +106,7 @@ docker run -p 5000:5000 python-app
 
 ### Current Testing Status
 
-**⚠️ Note: This application currently does not include unit tests.** This is a planned improvement for future development.
+**⚠️ Note: This application currently does not include unit tests.** This can be planned improvement for future development.
 
 ### Code Coverage with coverage.py
 
@@ -331,7 +331,7 @@ The pipeline requires these GitHub Secrets:
 
 ## 🚧 Future Improvements
 
-### Testing & Quality (Planned)
+### Testing & Quality (Future)
 - [ ] Add unit tests using pytest
 - [ ] Implement integration tests
 - [ ] Set up code coverage with coverage.py
@@ -339,11 +339,8 @@ The pipeline requires these GitHub Secrets:
 - [ ] Add performance testing
 - [ ] Implement API contract testing
 
-### Security Enhancements (Planned)
-- [ ] Add Bandit for Python-specific SAST
+### Security Enhancements (Future)
 - [ ] Implement dependency scanning with Snyk or Dependabot
-- [ ] Add security scorecards
-- [ ] Implement infrastructure as code scanning
 
 ### Code Coverage Setup (Future)
 When tests are added, configure coverage.py:
@@ -368,7 +365,7 @@ coverage html
 - Health check endpoint is essential for container orchestration
 - The CI/CD pipeline ensures comprehensive security with both SAST and DAST
 - GitOps approach enables automated Kubernetes deployments
-- **Unit tests and code coverage are planned improvements** - currently the focus is on security scanning and functional testing
+- **Unit tests and code coverage can be planned improvements** - currently the focus is on security scanning and functional testing
 - Coverage.py can be used to measure test coverage once unit tests are implemented
 
 This Python application demonstrates modern development practices with comprehensive SAST and DAST security testing, automated deployment through a robust CI/CD pipeline. The security testing covers both static code analysis and dynamic runtime testing for complete application security.
