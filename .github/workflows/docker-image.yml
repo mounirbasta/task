@@ -211,9 +211,9 @@ jobs:
           ls -la
           echo "Deployments directory contents:"
           ls -la deployments/
-          echo "Current image in app-dev.yaml:"
-          yq eval '.spec.template.spec.containers[0].image' deployments/app-dev.yaml || echo "yq command failed"
-          grep "image:" deployments/app-dev.yaml  
+          echo "Current image in app-deployment.yaml:"
+          yq eval '.spec.template.spec.containers[0].image' deployments/app-deployment.yaml || echo "yq command failed"
+          grep "image:" deployments/app-deployment.yaml  
 
       - name: Update Deployment YAML
         run: |
@@ -222,20 +222,20 @@ jobs:
           echo "Updating to image: $NEW_IMAGE"
           
           # Update the image in the deployment file
-          yq eval ".spec.template.spec.containers[0].image = \"$NEW_IMAGE\"" -i deployments/app-dev.yaml
+          yq eval ".spec.template.spec.containers[0].image = \"$NEW_IMAGE\"" -i deployments/app-deployment.yaml
           
           # Verify the change
           echo "Updated deployment image to:"
-          yq eval '.spec.template.spec.containers[0].image' deployments/app-dev.yaml
+          yq eval '.spec.template.spec.containers[0].image' deployments/app-deployment.yaml
 
-          cat deployments/app-dev.yaml
+          cat deployments/app-deployment.yaml
           
       - name: Commit and Push Changes
         run: |
           cd gitops-repo
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add deployments/app-dev.yaml
+          git add deployments/app-deployment.yaml
           
           # Check if there are changes
           if ! git diff --staged --quiet; then
